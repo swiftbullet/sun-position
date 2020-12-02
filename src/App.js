@@ -1,10 +1,10 @@
 import "./App.css";
-import Gauge from "./Gauge";
+
 
 function App() {
   return (
     <div className="App">
-      <Gauge />
+      
     </div>
   );
 }
