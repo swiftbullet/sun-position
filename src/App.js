@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import { createStore } from "redux";
-import { Provider } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
 
 import getPosition from "./utils/sun_position";
@@ -42,134 +42,32 @@ function valuetext(value) {
   return `${value}`;
 }
 
-function DiscreteSlider() {
-  // const [date, setDate] = useState(new Date());
-  const currentDate = new Date()
-  const dateO = {
-    year: currentDate.getFullYear(),
-    month: currentDate.getMonth(),
-    date: currentDate.getDate(),
-    hours: currentDate.getHours(),
-    minutes: currentDate.getMinutes(),
-    seconds: currentDate.getSeconds()
-  }
-  const [date, setDate] = useState(dateO);
+function Clock() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   useInterval(() => {
-    setDate(...date, date.setSeconds(date.getSeconds() + 1));
+    setCurrentTime(new Date());
   }, 1000);
-  const sliderRef = useRef(null)
-  
-  
-  const classes = useStyles();
-  return (
-    <div className={classes.root}>
-      <Typography id="discrete-slider" gutterBottom>
-        Year
-      </Typography>
-      {/* <span>date.</span> */}
-      <Slider
-        // defaultValue={2020}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        ref={sliderRef}
-        name="year"
-        value={date.year}
-        onChange={(e, value) => setDate({...date, year: value})}
-        step={1}
-        marks={false}
-        min={1990}
-        max={2030}
-      />
-      <Typography id="discrete-slider" gutterBottom>
-        Month
-      </Typography>
-      <Slider
-        // defaultValue={1}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        name="month"
-        value={date.month}
-        onChange={(e, value) => setDate({...date, month: value})}
-        step={1}
-        marks={false}
-        min={1}
-        max={12}
-      />
-      <Typography id="discrete-slider" gutterBottom>
-        Day
-      </Typography>
-      <Slider
-        defaultValue={1}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        name="day"
-        value={date.date}
-        onChange={(e, value) => setDate({...date, date: value})}
-        step={1}
-        marks={false}
-        min={1}
-        max={30}
-      />
-      <Typography id="discrete-slider" gutterBottom>
-        Hour
-      </Typography>
-      <Slider
-        defaultValue={0}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        name="hour"
-        value={date.hours}
-        onChange={(e, value) => setDate({...date, hours: value})}
-        step={1}
-        marks={false}
-        min={0}
-        max={24}
-      />
-      <Typography id="discrete-slider" gutterBottom>
-        Minute
-      </Typography>
-      <Slider
-        defaultValue={0}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        name="minute"
-        value={date.minutes}
-        onChange={(e, value) => setDate({...date, minutes: value})}
-        step={1}
-        marks={false}
-        min={0}
-        max={60}
-      />
-      <Typography id="discrete-slider" gutterBottom>
-        Second
-      </Typography>
-      <Slider
-        defaultValue={0}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        name="second"
-        value={date.seconds}
-        onChange={(e, value) => setDate({...date, seconds: value})}
-        step={1}
-        marks={false}
-        min={0}
-        max={60}
-      />
-    </div>
-  );
+  return <div className="date">{currentTime.toLocaleTimeString("ru-RU")}</div>;
 }
 
-//51.84, 107.6
+
 
 function App() {
   const [selectedDate, handleDateChange] = useState(new Date());
-  const { azimuth, altitude } = getPosition(new Date(), 51.84, 107.6);
+
+  const initial_longitude = 107.6;
+  const initial_latitude = 51.84;
+  const [coordinates, setCoordinates] = useState({
+    latitude: initial_latitude,
+    longitude: initial_longitude,
+  });
+  // const date = new Date();
+  const { azimuth, altitude } = getPosition(
+    selectedDate,
+    coordinates.latitude,
+    coordinates.longitude
+  );
   // var position = SunCalc.getPosition(new Date(), 51, 107);
   const azimuth_to_degrees = (rad) => {
     const degree = rad * (180 / Math.PI);
@@ -199,6 +97,8 @@ function App() {
     }
   };
 
+  const classes = useStyles();
+
   return (
     <Provider store={store}>
       <div className="App">
@@ -207,12 +107,17 @@ function App() {
           <TimePicker value={selectedDate} onChange={handleDateChange} />
         </MuiPickersUtilsProvider>
 
-        <div className="date">
-          {new Date().toLocaleTimeString("en-US").split("/:" | "/")}
-        </div>
-        <div className="azimuth">Azimuth: {azimuth_deg.toFixed(2)}<sup>o</sup></div>
+        <Clock />
 
-        <div className="altitude">Altitude: {altitude_deg.toFixed(2)}<sup>o</sup></div>
+        <div className="azimuth">
+          Azimuth: {azimuth_deg.toFixed(2)}
+          <sup>o</sup>
+        </div>
+
+        <div className="altitude">
+          Altitude: {altitude_deg.toFixed(2)}
+          <sup>o</sup>
+        </div>
         {/* <div className="altitude">{position.altitude}</div> */}
         <div
           className="container"
@@ -232,8 +137,41 @@ function App() {
             style={{ border: `${color(altitude_deg)} solid 3px` }}
           ></div>
         </div>
-
-        <DiscreteSlider />
+        <div className={classes.root}>
+          <Typography id="discrete-slider" gutterBottom>
+            Latitude
+          </Typography>
+          {/* <span>date.</span> */}
+          <Slider
+            // defaultValue={2020}
+            getAriaValueText={valuetext}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            value={coordinates.latitude}
+            onChange={(e, value) =>
+              setCoordinates({ ...coordinates, latitude: value })
+            }
+            marks={false}
+            min={-90}
+            max={90}
+          />
+          <Typography id="discrete-slider" gutterBottom>
+            Longitude
+          </Typography>
+          <Slider
+            // defaultValue={1}
+            getAriaValueText={valuetext}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            value={coordinates.longitude}
+            onChange={(e, value) =>
+              setCoordinates({ ...coordinates, longitude: value })
+            }
+            marks={false}
+            min={-180}
+            max={180}
+          />
+        </div>
       </div>
     </Provider>
   );
