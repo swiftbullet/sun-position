@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import DateFnsUtils from "@date-io/date-fns"; // choose your lib
 import {
   DatePicker,
@@ -14,7 +14,29 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
 
 import getPosition from "./utils/sun_position";
-// import { colors } from "material-ui/styles";
+
+const language = {
+  EN: {
+    currentTime: "Current time",
+    selectedTime: "Selected time",
+    darkTheme: "Dark Theme",
+    lightTheme: "Light Theme",
+    azimuth: "Azimuth",
+    altitude: "Altitude",
+    latitude: "Latitude",
+    longitude: "Longitude",
+  },
+  RU: {
+    currentTime: "Текущее время",
+    selectedTime: "Выбранное время",
+    darkTheme: "Темная тема",
+    lightTheme: "Светлая тема",
+    azimuth: "Азимут",
+    altitude: "Высота",
+    latitude: "Широта",
+    longitude: "Долгота",
+  },
+};
 
 //default value
 const initialState = {};
@@ -29,6 +51,10 @@ const rootReducer = (state = initialState, action) => {
   }
 };
 
+//action creators
+
+//actions
+
 //store
 const store = createStore(rootReducer, initialState);
 
@@ -42,135 +68,175 @@ function valuetext(value) {
   return `${value}`;
 }
 
-function Clock() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useInterval(() => {
-    setCurrentTime(new Date());
-  }, 1000);
-  return <div className="date">{currentTime.toLocaleTimeString("ru-RU")}</div>;
-}
-
-
-
 function App() {
   const [selectedDate, handleDateChange] = useState(new Date());
 
-  const initial_longitude = 107.6;
-  const initial_latitude = 51.84;
+  const [langData, setLangData] = useState(language.RU);
+
+  const [theme, setTheme] = useState({ dark: false });
+
+  const defaultLongitude = 107.6;
+  const defaultLatitude = 51.84;
+
   const [coordinates, setCoordinates] = useState({
-    latitude: initial_latitude,
-    longitude: initial_longitude,
+    latitude: defaultLatitude,
+    longitude: defaultLongitude,
   });
-  // const date = new Date();
-  const { azimuth, altitude } = getPosition(
-    selectedDate,
-    coordinates.latitude,
-    coordinates.longitude
+
+  const [sunPosition, setSunPosition] = useState(
+    getPosition(selectedDate, coordinates.latitude, coordinates.longitude)
   );
-  // var position = SunCalc.getPosition(new Date(), 51, 107);
-  const azimuth_to_degrees = (rad) => {
-    const degree = rad * (180 / Math.PI);
-    return degree + 180;
-  };
-  const altitude_to_degrees = (rad) => {
+
+  const radiansToDegrees = (rad) => {
     const degree = rad * (180 / Math.PI);
     return degree;
   };
-  const azimuth_deg = azimuth_to_degrees(azimuth);
-  const altitude_deg = altitude_to_degrees(altitude);
 
-  const night_color = "#5e81ac";
-  const golden_hours_color = "#f08c00";
-  const twilight_color = "#9775fa";
-  const daylight_color = "#228be6";
+  const azimuthDeg = radiansToDegrees(sunPosition.azimuth) + 180;
+  const altitudeDeg = radiansToDegrees(sunPosition.altitude);
 
-  const color = (sun_altitude) => {
-    if (sun_altitude >= 10) {
-      return daylight_color;
-    } else if (sun_altitude < 10 && sun_altitude >= 0) {
-      return golden_hours_color;
-    } else if (sun_altitude < 0 && sun_altitude >= -10) {
-      return twilight_color;
-    } else if (sun_altitude < -10) {
-      return night_color;
+  useInterval(() => {
+    setSunPosition(
+      getPosition(
+        selectedDate.setSeconds(selectedDate.getSeconds() + 1),
+        coordinates.latitude,
+        coordinates.longitude
+      )
+    );
+  }, 1000);
+
+  const nightColor = "#5e81ac";
+  const goldenHoursColor = "#f08c00";
+  const twilightColor = "#9775fa";
+  const daylightColor = "#228be6";
+
+  const color = (sunAltitude) => {
+    if (sunAltitude >= 10) {
+      return daylightColor;
+    } else if (sunAltitude < 10 && sunAltitude >= 0) {
+      return goldenHoursColor;
+    } else if (sunAltitude < 0 && sunAltitude >= -10) {
+      return twilightColor;
+    } else if (sunAltitude < -10) {
+      return nightColor;
     }
   };
 
   const classes = useStyles();
 
+  function Clock() {
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return (
+      <div className="current-time">
+        {langData.currentTime}: {currentTime.toLocaleTimeString("ru-RU")}
+      </div>
+    );
+  }
+
   return (
     <Provider store={store}>
-      <div className="App">
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <DatePicker value={selectedDate} onChange={handleDateChange} />
-          <TimePicker value={selectedDate} onChange={handleDateChange} />
-        </MuiPickersUtilsProvider>
-
-        <Clock />
-
-        <div className="azimuth">
-          Azimuth: {azimuth_deg.toFixed(2)}
-          <sup>o</sup>
-        </div>
-
-        <div className="altitude">
-          Altitude: {altitude_deg.toFixed(2)}
-          <sup>o</sup>
-        </div>
-        {/* <div className="altitude">{position.altitude}</div> */}
-        <div
-          className="container"
-          style={{ transform: `rotateZ(${azimuth_deg}deg)` }}
-        >
-          <div
-            className="marker"
-            style={{ border: `${color(altitude_deg)} solid 3px` }}
-          ></div>
-        </div>
-        <div
-          className="container"
-          style={{ transform: `rotateZ(${-altitude_deg + 90}deg)` }}
-        >
-          <div
-            className="marker"
-            style={{ border: `${color(altitude_deg)} solid 3px` }}
-          ></div>
-        </div>
-        <div className={classes.root}>
-          <Typography id="discrete-slider" gutterBottom>
-            Latitude
-          </Typography>
-          {/* <span>date.</span> */}
-          <Slider
-            // defaultValue={2020}
-            getAriaValueText={valuetext}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            value={coordinates.latitude}
-            onChange={(e, value) =>
-              setCoordinates({ ...coordinates, latitude: value })
+      <div className={theme.dark ? "App dark" : "App"}>
+        <div className="toggle-buttons">
+          <button
+            className="toggle-theme"
+            onClick={() =>
+              theme.dark ? setTheme({ dark: false }) : setTheme({ dark: true })
             }
-            marks={false}
-            min={-90}
-            max={90}
-          />
-          <Typography id="discrete-slider" gutterBottom>
-            Longitude
-          </Typography>
-          <Slider
-            // defaultValue={1}
-            getAriaValueText={valuetext}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            value={coordinates.longitude}
-            onChange={(e, value) =>
-              setCoordinates({ ...coordinates, longitude: value })
+          >
+            {theme.dark ? langData.lightTheme : langData.darkTheme}
+          </button>
+          <button
+            className="toggle-lang"
+            onClick={() =>
+              langData === language.RU
+                ? setLangData(language.EN)
+                : setLangData(language.RU)
             }
-            marks={false}
-            min={-180}
-            max={180}
-          />
+          >
+            {langData === language.RU ? "EN" : "RU"}
+          </button>
+        </div>
+
+        <div className="main">
+          <Clock />
+
+          {/* <div className="altitude">{position.altitude}</div> */}
+          <div className="sun-info">
+            <div className="sun-info__block">
+              <div
+                className="sun-info__gauge"
+                style={{ transform: `rotateZ(${azimuthDeg + 180}deg)` }}
+              >
+                <div
+                  className="sun-info__marker"
+                  style={{ border: `${color(altitudeDeg)} solid .5vw` }}
+                ></div>
+              </div>
+              <div className="sun-info__data">
+                {langData.azimuth}: {azimuthDeg.toFixed(2)}
+                <sup>o</sup>
+              </div>
+            </div>
+            <div className="sun-info__block">
+              <div
+                className="sun-info__gauge"
+                style={{ transform: `rotateZ(${-altitudeDeg - 90}deg)` }}
+              >
+                <div
+                  className="sun-info__marker"
+                  style={{ border: `${color(altitudeDeg)} solid 0.5vw` }}
+                ></div>
+              </div>
+              <div className="sun-info__data">
+                {langData.altitude}: {altitudeDeg.toFixed(2)}
+                <sup>o</sup>
+              </div>
+            </div>
+          </div>
+
+          <div className="inputs">
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DatePicker value={selectedDate} onChange={handleDateChange} />
+              <TimePicker value={selectedDate} onChange={handleDateChange} />
+            </MuiPickersUtilsProvider>
+            <div className={classes.root}>
+              <Typography id="discrete-slider" gutterBottom>
+                {langData.latitude}
+              </Typography>
+
+              <Slider
+                getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider"
+                valueLabelDisplay="auto"
+                value={coordinates.latitude}
+                onChange={(e, value) =>
+                  setCoordinates({ ...coordinates, latitude: value })
+                }
+                marks={false}
+                min={-90}
+                max={90}
+              />
+              <Typography id="discrete-slider" gutterBottom>
+                {langData.longitude}
+              </Typography>
+              <Slider
+                getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider"
+                valueLabelDisplay="auto"
+                value={coordinates.longitude}
+                onChange={(e, value) =>
+                  setCoordinates({ ...coordinates, longitude: value })
+                }
+                marks={false}
+                min={-180}
+                max={180}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Provider>
