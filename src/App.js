@@ -9,11 +9,11 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
-import { createStore } from "redux";
-import { Provider, useDispatch, useSelector } from "react-redux";
+
+import { useDispatch, useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
 
-import getPosition from "./utils/sun_position";
+import getPosition from "./utils/sunPosition";
 
 const language = {
   EN: {
@@ -38,8 +38,19 @@ const language = {
   },
 };
 
+const defaultLongitude = 107.6;
+const defaultLatitude = 51.84;
+
 //default value
-const initialState = {};
+const initialState = {
+  selectedDate: new Date(),
+  langData: language.RU,
+  theme: { dark: false },
+  coordinates: {
+    latitude: defaultLatitude,
+    longitude: defaultLongitude,
+  },
+};
 
 //reducers
 const rootReducer = (state = initialState, action) => {
@@ -50,13 +61,6 @@ const rootReducer = (state = initialState, action) => {
       return state;
   }
 };
-
-//action creators
-
-//actions
-
-//store
-const store = createStore(rootReducer, initialState);
 
 const useStyles = makeStyles({
   root: {
@@ -138,108 +142,106 @@ function App() {
   }
 
   return (
-    <Provider store={store}>
-      <div className={theme.dark ? "App dark" : "App"}>
-        <div className="toggle-buttons">
-          <button
-            className="toggle-theme"
-            onClick={() =>
-              theme.dark ? setTheme({ dark: false }) : setTheme({ dark: true })
-            }
-          >
-            {theme.dark ? langData.lightTheme : langData.darkTheme}
-          </button>
-          <button
-            className="toggle-lang"
-            onClick={() =>
-              langData === language.RU
-                ? setLangData(language.EN)
-                : setLangData(language.RU)
-            }
-          >
-            {langData === language.RU ? "EN" : "RU"}
-          </button>
-        </div>
+    <div className={theme.dark ? "App dark" : "App"}>
+      <div className="toggle-buttons">
+        <button
+          className="toggle-theme"
+          onClick={() =>
+            theme.dark ? setTheme({ dark: false }) : setTheme({ dark: true })
+          }
+        >
+          {theme.dark ? langData.lightTheme : langData.darkTheme}
+        </button>
+        <button
+          className="toggle-lang"
+          onClick={() =>
+            langData === language.RU
+              ? setLangData(language.EN)
+              : setLangData(language.RU)
+          }
+        >
+          {langData === language.RU ? "EN" : "RU"}
+        </button>
+      </div>
 
-        <div className="main">
-          <Clock />
+      <div className="main">
+        <Clock />
 
-          {/* <div className="altitude">{position.altitude}</div> */}
-          <div className="sun-info">
-            <div className="sun-info__block">
+        {/* <div className="altitude">{position.altitude}</div> */}
+        <div className="sun-info">
+          <div className="sun-info__block">
+            <div
+              className="sun-info__gauge"
+              style={{ transform: `rotateZ(${azimuthDeg + 180}deg)` }}
+            >
               <div
-                className="sun-info__gauge"
-                style={{ transform: `rotateZ(${azimuthDeg + 180}deg)` }}
-              >
-                <div
-                  className="sun-info__marker"
-                  style={{ border: `${color(altitudeDeg)} solid .5vw` }}
-                ></div>
-              </div>
-              <div className="sun-info__data">
-                {langData.azimuth}: {azimuthDeg.toFixed(2)}
-                <sup>o</sup>
-              </div>
+                className="sun-info__marker"
+                style={{ border: `${color(altitudeDeg)} solid .5vw` }}
+              ></div>
             </div>
-            <div className="sun-info__block">
-              <div
-                className="sun-info__gauge"
-                style={{ transform: `rotateZ(${-altitudeDeg - 90}deg)` }}
-              >
-                <div
-                  className="sun-info__marker"
-                  style={{ border: `${color(altitudeDeg)} solid 0.5vw` }}
-                ></div>
-              </div>
-              <div className="sun-info__data">
-                {langData.altitude}: {altitudeDeg.toFixed(2)}
-                <sup>o</sup>
-              </div>
+            <div className="sun-info__data">
+              {langData.azimuth}: {azimuthDeg.toFixed(2)}
+              <sup>o</sup>
             </div>
           </div>
-
-          <div className="inputs">
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <DatePicker value={selectedDate} onChange={handleDateChange} />
-              <TimePicker value={selectedDate} onChange={handleDateChange} />
-            </MuiPickersUtilsProvider>
-            <div className={classes.root}>
-              <Typography id="discrete-slider" gutterBottom>
-                {langData.latitude}
-              </Typography>
-
-              <Slider
-                getAriaValueText={valuetext}
-                aria-labelledby="discrete-slider"
-                valueLabelDisplay="auto"
-                value={coordinates.latitude}
-                onChange={(e, value) =>
-                  setCoordinates({ ...coordinates, latitude: value })
-                }
-                marks={false}
-                min={-90}
-                max={90}
-              />
-              <Typography id="discrete-slider" gutterBottom>
-                {langData.longitude}
-              </Typography>
-              <Slider
-                getAriaValueText={valuetext}
-                aria-labelledby="discrete-slider"
-                valueLabelDisplay="auto"
-                value={coordinates.longitude}
-                onChange={(e, value) =>
-                  setCoordinates({ ...coordinates, longitude: value })
-                }
-                marks={false}
-                min={-180}
-                max={180}
-              />
+          <div className="sun-info__block">
+            <div
+              className="sun-info__gauge"
+              style={{ transform: `rotateZ(${-altitudeDeg - 90}deg)` }}
+            >
+              <div
+                className="sun-info__marker"
+                style={{ border: `${color(altitudeDeg)} solid 0.5vw` }}
+              ></div>
             </div>
+            <div className="sun-info__data">
+              {langData.altitude}: {altitudeDeg.toFixed(2)}
+              <sup>o</sup>
+            </div>
+          </div>
+        </div>
+
+        <div className="inputs">
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <DatePicker value={selectedDate} onChange={handleDateChange} />
+            <TimePicker value={selectedDate} onChange={handleDateChange} />
+          </MuiPickersUtilsProvider>
+          <div className={classes.root}>
+            <Typography id="discrete-slider" gutterBottom>
+              {langData.latitude}
+            </Typography>
+
+            <Slider
+              getAriaValueText={valuetext}
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              value={coordinates.latitude}
+              onChange={(e, value) =>
+                setCoordinates({ ...coordinates, latitude: value })
+              }
+              marks={false}
+              min={-90}
+              max={90}
+            />
+            <Typography id="discrete-slider" gutterBottom>
+              {langData.longitude}
+            </Typography>
+            <Slider
+              getAriaValueText={valuetext}
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              value={coordinates.longitude}
+              onChange={(e, value) =>
+                setCoordinates({ ...coordinates, longitude: value })
+              }
+              marks={false}
+              min={-180}
+              max={180}
+            />
           </div>
         </div>
       </div>
-    </Provider>
+    </div>
   );
 }
 
