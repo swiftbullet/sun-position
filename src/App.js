@@ -10,6 +10,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 
+import CurrentTime from "./components/CurrentTime"
+import Inputs from "./components/Inputs"
+import SunInfo from "./components/SunInfo"
+import ToggleButtons from "./components/ToggleButtons"
+
 import { useDispatch, useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
 
