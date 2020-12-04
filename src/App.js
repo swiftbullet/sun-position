@@ -1,6 +1,6 @@
 import "./App.css";
 import { useState } from "react";
-import DateFnsUtils from "@date-io/date-fns"; // choose your lib
+import DateFnsUtils from "@date-io/date-fns";
 import {
   DatePicker,
   TimePicker,
@@ -10,10 +10,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 
-import CurrentTime from "./components/CurrentTime"
-import Inputs from "./components/Inputs"
-import SunInfo from "./components/SunInfo"
-import ToggleButtons from "./components/ToggleButtons"
+import CurrentTime from "./components/CurrentTime";
+import Inputs from "./components/Inputs";
+import SunInfo from "./components/SunInfo";
+import ToggleButtons from "./components/ToggleButtons";
+
+import changeDate from "./actions/changeDate";
+import setLatitude from "./actions/setLatitude";
+import setLongitude from "./actions/setLongitude";
+import switchLanguage from "./actions/switchLanguage";
+import switchTheme from "./actions/switchTheme";
 
 import { useDispatch, useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
@@ -43,30 +49,6 @@ const language = {
   },
 };
 
-const defaultLongitude = 107.6;
-const defaultLatitude = 51.84;
-
-//default value
-const initialState = {
-  selectedDate: new Date(),
-  langData: language.RU,
-  theme: { dark: false },
-  coordinates: {
-    latitude: defaultLatitude,
-    longitude: defaultLongitude,
-  },
-};
-
-//reducers
-const rootReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case action.type === "":
-      return 0;
-    default:
-      return state;
-  }
-};
-
 const useStyles = makeStyles({
   root: {
     width: 300,
@@ -78,22 +60,19 @@ function valuetext(value) {
 }
 
 function App() {
-  const [selectedDate, handleDateChange] = useState(new Date());
+  // const [selectedDate, handleDateChange] = useState(new Date());
+  const selectedDate = useSelector((state) => state.selectedDate);
+  const dispatch = useDispatch();
 
-  const [langData, setLangData] = useState(language.RU);
+  const langData = useSelector((state) => state.langData);
 
-  const [theme, setTheme] = useState({ dark: false });
+  const theme = useSelector((state) => state.theme);
 
-  const defaultLongitude = 107.6;
-  const defaultLatitude = 51.84;
-
-  const [coordinates, setCoordinates] = useState({
-    latitude: defaultLatitude,
-    longitude: defaultLongitude,
-  });
+  const latitude = useSelector((state) => state.latitude);
+  const longitude = useSelector((state) => state.longitude);
 
   const [sunPosition, setSunPosition] = useState(
-    getPosition(selectedDate, coordinates.latitude, coordinates.longitude)
+    getPosition(selectedDate, latitude, longitude)
   );
 
   const radiansToDegrees = (rad) => {
@@ -108,8 +87,8 @@ function App() {
     setSunPosition(
       getPosition(
         selectedDate.setSeconds(selectedDate.getSeconds() + 1),
-        coordinates.latitude,
-        coordinates.longitude
+        latitude,
+        longitude
       )
     );
   }, 1000);
@@ -152,7 +131,9 @@ function App() {
         <button
           className="toggle-theme"
           onClick={() =>
-            theme.dark ? setTheme({ dark: false }) : setTheme({ dark: true })
+            theme.dark
+              ? dispatch(switchTheme({ dark: false }))
+              : dispatch(switchTheme({ dark: true }))
           }
         >
           {theme.dark ? langData.lightTheme : langData.darkTheme}
@@ -161,8 +142,8 @@ function App() {
           className="toggle-lang"
           onClick={() =>
             langData === language.RU
-              ? setLangData(language.EN)
-              : setLangData(language.RU)
+              ? dispatch(switchLanguage(language.EN))
+              : dispatch(switchLanguage(language.RU))
           }
         >
           {langData === language.RU ? "EN" : "RU"}
@@ -172,7 +153,7 @@ function App() {
       <div className="main">
         <Clock />
 
-        {/* <div className="altitude">{position.altitude}</div> */}
+
         <div className="sun-info">
           <div className="sun-info__block">
             <div
@@ -208,8 +189,14 @@ function App() {
 
         <div className="inputs">
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <DatePicker value={selectedDate} onChange={handleDateChange} />
-            <TimePicker value={selectedDate} onChange={handleDateChange} />
+            <DatePicker
+              value={selectedDate}
+              onChange={(e, value) => dispatch(changeDate(value))}
+            />
+            <TimePicker
+              value={selectedDate}
+              onChange={(e, value) => dispatch(changeDate(value))}
+            />
           </MuiPickersUtilsProvider>
           <div className={classes.root}>
             <Typography id="discrete-slider" gutterBottom>
@@ -220,10 +207,8 @@ function App() {
               getAriaValueText={valuetext}
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
-              value={coordinates.latitude}
-              onChange={(e, value) =>
-                setCoordinates({ ...coordinates, latitude: value })
-              }
+              value={latitude}
+              onChange={(e, value) => dispatch(setLatitude(value))}
               marks={false}
               min={-90}
               max={90}
@@ -235,10 +220,8 @@ function App() {
               getAriaValueText={valuetext}
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
-              value={coordinates.longitude}
-              onChange={(e, value) =>
-                setCoordinates({ ...coordinates, longitude: value })
-              }
+              value={longitude}
+              onChange={(e, value) => dispatch(setLongitude(value))}
               marks={false}
               min={-180}
               max={180}

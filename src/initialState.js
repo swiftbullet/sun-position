@@ -7,10 +7,8 @@ const initialState = {
   selectedDate: new Date(),
   langData: language.RU,
   theme: { dark: false },
-  coordinates: {
-    latitude: defaultLatitude,
-    longitude: defaultLongitude,
-  },
+  latitude: defaultLatitude,
+  longitude: defaultLongitude,
 };
 
 export default initialState;
