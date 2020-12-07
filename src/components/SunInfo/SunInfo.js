@@ -6,10 +6,10 @@ import getPosition from "./../../utils/sunPosition";
 
 import "./SunInfo.css";
 
-const nightColor = "#5e81ac";
+const daylightColor = "#228be6";
 const goldenHoursColor = "#f08c00";
 const twilightColor = "#9775fa";
-const daylightColor = "#228be6";
+const nightColor = "#5e81ac";
 
 const color = (sunAltitude) => {
   if (sunAltitude >= 10) {
@@ -33,6 +33,7 @@ export default function SunInfo() {
   const selectedDate = useSelector((state) => state.selectedDate);
   const latitude = useSelector((state) => state.latitude);
   const longitude = useSelector((state) => state.longitude);
+
   const [sunPosition, setSunPosition] = useState(
     getPosition(selectedDate, latitude, longitude)
   );

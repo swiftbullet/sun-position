@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 
-import CurrentTime from "./components/CurrentTime";
-import Inputs from "./components/Inputs";
-import SunInfo from "./components/SunInfo";
 import ToggleButtons from "./components/ToggleButtons";
+import CurrentTime from "./components/CurrentTime";
+import SunInfo from "./components/SunInfo";
+import Inputs from "./components/Inputs";
 
 import "./App.css";
 

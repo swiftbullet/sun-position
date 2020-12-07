@@ -1,15 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import switchLanguage from "./../../actions/switchLanguage";
 import switchTheme from "./../../actions/switchTheme";
+import switchLanguage from "./../../actions/switchLanguage";
 
 import language from "./../../intl/language";
 
 import "./ToggleButton.css";
 
 export default function ToggleButton() {
-  const langData = useSelector((state) => state.langData);
   const theme = useSelector((state) => state.theme);
+  const langData = useSelector((state) => state.langData);
   const dispatch = useDispatch();
 
   return (

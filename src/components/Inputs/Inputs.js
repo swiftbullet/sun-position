@@ -46,11 +46,11 @@ export default function Inputs() {
           onChange={(e, value) => dispatch(changeDate(value))}
         />
       </MuiPickersUtilsProvider>
+
       <div className={classes.root}>
         <Typography id="discrete-slider" gutterBottom>
           {langData.latitude}
         </Typography>
-
         <Slider
           getAriaValueText={valuetext}
           aria-labelledby="discrete-slider"
@@ -61,6 +61,7 @@ export default function Inputs() {
           min={-90}
           max={90}
         />
+
         <Typography id="discrete-slider" gutterBottom>
           {langData.longitude}
         </Typography>
