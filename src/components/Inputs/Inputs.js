@@ -10,9 +10,9 @@ import {
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 
-import changeDate from "./actions/changeDate";
-import setLatitude from "./actions/setLatitude";
-import setLongitude from "./actions/setLongitude";
+import changeDate from "./../../actions/changeDate";
+import setLatitude from "./../../actions/setLatitude";
+import setLongitude from "./../../actions/setLongitude";
 
 import "./Inputs.css";
 

@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import switchLanguage from "./actions/switchLanguage";
-import switchTheme from "./actions/switchTheme";
+import switchLanguage from "./../../actions/switchLanguage";
+import switchTheme from "./../../actions/switchTheme";
 
-import language from "./intl/language";
+import language from "./../../intl/language";
 
 import "./ToggleButton.css";
 

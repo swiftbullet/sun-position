@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import useInterval from "@use-it/interval";
 
-import getPosition from "./utils/sunPosition";
+import getPosition from "./../../utils/sunPosition";
 
 import "./SunInfo.css";
 
