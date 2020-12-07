@@ -1,0 +1,33 @@
+.sun-info {
+  display: flex;
+  flex-direction: row;
+}
+
+.sun-info__data {
+  margin: 10px auto;
+}
+
+.sun-info__gauge {
+  height: 15vw;
+  width: 15vw;
+  min-height: 100px;
+  min-width: 100px;
+  margin: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: last baseline;
+  border: var(--gauge-color) solid 1.5vw;
+  border-radius: 50%;
+  transition: all 0.5s;
+}
+
+.sun-info__marker {
+  height: 1vw;
+  width: 1vw;
+  border-radius: 50%;
+  transform: translateY(1.75vw);
+}
+
+.sun-info__block {
+  position: relative;
+}

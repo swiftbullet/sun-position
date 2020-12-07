@@ -1,0 +1,52 @@
+.inputs {
+  margin: 15px 10px;
+}
+
+.MuiTypography-root {
+  padding-top: 25px;
+}
+
+.inputs {
+  margin: 35px;
+}
+
+.toggle-theme,
+.toggle-lang {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  background: transparent;
+  border: black solid 2px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.toggle-theme:hover,
+.toggle-lang:hover {
+  background-color: var(--button-hover);
+  color: white;
+  border: white solid 2px;
+}
+
+.dark .toggle-theme,
+.dark .toggle-lang {
+  margin: 10px 0;
+  padding: 10px;
+  background: transparent;
+  color: white;
+  border: white solid 2px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.dark .MuiInput-underline::before {
+  border-bottom: white;
+}
+
+.dark .toggle-theme:hover,
+.dark .toggle-lang:hover {
+  color: var(--darktheme-glow);
+  border: var(--darktheme-glow) solid 2px;
+  box-shadow: var(--darktheme-glow) 0 0 5px;
+  text-shadow: var(--darktheme-glow) 0 0 5px;
+}

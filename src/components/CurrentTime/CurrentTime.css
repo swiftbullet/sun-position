@@ -1,0 +1,9 @@
+.current-time {
+  margin: 15px 10px;
+}
+
+@media (max-width: 540px) {
+  .current-time {
+    align-self: flex-start;
+  }
+}
