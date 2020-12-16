@@ -10,14 +10,12 @@ import {
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 
-import changeDate from "./../../actions/changeDate";
 import setLatitude from "./../../actions/setLatitude";
 import setLongitude from "./../../actions/setLongitude";
 
 import "./Inputs.css";
 
-export default function Inputs() {
-  const selectedDate = useSelector((state) => state.selectedDate);
+export default function Inputs({ selectedDate, handleDateChange }) {
   const langData = useSelector((state) => state.langData);
   const latitude = useSelector((state) => state.latitude);
   const longitude = useSelector((state) => state.longitude);
@@ -37,14 +35,8 @@ export default function Inputs() {
   return (
     <div className="inputs">
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <DatePicker
-          value={selectedDate}
-          onChange={(e, value) => dispatch(changeDate(value))}
-        />
-        <TimePicker
-          value={selectedDate}
-          onChange={(e, value) => dispatch(changeDate(value))}
-        />
+        <DatePicker value={selectedDate} onChange={handleDateChange} />
+        <TimePicker value={selectedDate} onChange={handleDateChange} />
       </MuiPickersUtilsProvider>
 
       <div className={classes.root}>

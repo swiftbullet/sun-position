@@ -28,9 +28,8 @@ const radiansToDegrees = (rad) => {
   return degree;
 };
 
-export default function SunInfo() {
+export default function SunInfo({ selectedDate }) {
   const langData = useSelector((state) => state.langData);
-  const selectedDate = useSelector((state) => state.selectedDate);
   const latitude = useSelector((state) => state.latitude);
   const longitude = useSelector((state) => state.longitude);
 
